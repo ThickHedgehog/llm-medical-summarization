@@ -1,0 +1,125 @@
+# Full Fine-Tuning Configuration for Medical Summarization
+# Extends base_config.yaml with full fine-tuning specific parameters
+
+# ============================================
+# Full Fine-Tuning Settings
+# ============================================
+full_finetuning:
+  # Update all parameters
+  freeze_encoder: false
+  freeze_decoder: false
+  freeze_embeddings: false
+  
+  # Alternatively, can freeze some layers for partial fine-tuning
+  freeze_layers: null  # e.g., [0, 1, 2] to freeze first 3 layers
+
+# ============================================
+# Training Overrides for Full Fine-Tuning
+# ============================================
+training:
+  # Lower learning rate for full fine-tuning to prevent catastrophic forgetting
+  learning_rate: 5.0e-5
+  
+  # Smaller batch sizes due to memory constraints
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8  # Effective batch size = 16
+  
+  # Fewer epochs to prevent overfitting
+  num_epochs: 3
+  
+  # Weight decay for regularization
+  weight_decay: 0.01
+  
+  # Warmup helps stability with full fine-tuning
+  warmup_ratio: 0.1
+  lr_scheduler_type: linear
+  
+  # Gradient clipping is important
+  max_grad_norm: 1.0
+  
+  # Enable gradient checkpointing to save memory
+  gradient_checkpointing: true
+  
+  # Evaluation and logging
+  eval_steps: 500
+  logging_steps: 100
+  save_steps: 500
+  
+  # Early stopping to prevent overfitting
+  early_stopping: true
+  early_stopping_patience: 2
+  early_stopping_threshold: 0.001
+  
+  # Mixed precision training
+  fp16: true
+  bf16: false
+
+# ============================================
+# Memory Optimization for Full Fine-Tuning
+# ============================================
+memory:
+  # Gradient checkpointing saves memory at cost of speed
+  gradient_checkpointing: true
+  
+  # DeepSpeed configuration (if available)
+  use_deepspeed: false
+  deepspeed_config: null
+  
+  # Mixed precision
+  fp16: true
+  
+  # Optionally use CPU offloading for optimizer states
+  cpu_offload: false
+
+# ============================================
+# Model-Specific Settings
+# ============================================
+# Different settings per model size due to memory constraints
+model_specific:
+  flan-t5-small:
+    per_device_train_batch_size: 8
+    gradient_accumulation_steps: 2
+    gradient_checkpointing: false
+    learning_rate: 5.0e-5
+    
+  flan-t5-base:
+    per_device_train_batch_size: 4
+    gradient_accumulation_steps: 4
+    gradient_checkpointing: false
+    learning_rate: 3.0e-5
+    
+  flan-t5-large:
+    per_device_train_batch_size: 2
+    gradient_accumulation_steps: 8
+    gradient_checkpointing: true
+    learning_rate: 2.0e-5
+
+# ============================================
+# Regularization Techniques
+# ============================================
+regularization:
+  # Label smoothing helps with generalization
+  label_smoothing_factor: 0.1
+  
+  # Dropout (use model defaults)
+  dropout: null
+  attention_dropout: null
+  
+  # Weight decay
+  weight_decay: 0.01
+
+# ============================================
+# Expected Metrics
+# ============================================
+# Trainable parameters for full fine-tuning:
+# Flan-T5 Small:  ~80M params (100%)
+# Flan-T5 Base:   ~250M params (100%)
+# Flan-T5 Large:  ~780M params (100%)
+
+# Memory requirements (approximate, with batch size 1):
+# Flan-T5 Small:  ~2-4 GB
+# Flan-T5 Base:   ~4-8 GB
+# Flan-T5 Large:  ~12-20 GB
+
+# With gradient checkpointing and batch size as configured:
+# Flan-T5 Large should fit in ~24-30 GB

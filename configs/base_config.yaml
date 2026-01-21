@@ -1,0 +1,151 @@
+# Base Configuration for Medical Summarization Experiments
+# This file contains shared settings across all adaptation methods
+
+# ============================================
+# Model Configuration
+# ============================================
+model:
+  # Available models to experiment with
+  models_to_compare:
+    - google/flan-t5-small   # 80M parameters
+    - google/flan-t5-base    # 250M parameters
+    - google/flan-t5-large   # 780M parameters
+  
+  # Default model for quick testing
+  default_model: google/flan-t5-base
+  
+  # Generation settings
+  generation:
+    max_new_tokens: 256
+    min_length: 30
+    num_beams: 4
+    length_penalty: 2.0
+    early_stopping: true
+    no_repeat_ngram_size: 3
+
+# ============================================
+# Dataset Configuration
+# ============================================
+dataset:
+  name: ccdv/pubmed-summarization
+  
+  # Column mappings
+  input_column: article
+  target_column: abstract
+  
+  # Preprocessing
+  max_input_length: 1024      # Truncate long articles
+  max_target_length: 256      # Max summary length
+  
+  # Data splits
+  train_size: null            # null = use full train set
+  validation_size: null       # null = use full validation set
+  test_size: null             # null = use full test set
+  
+  # For quick experiments, use smaller subsets
+  debug_mode: false
+  debug_train_size: 1000
+  debug_val_size: 200
+  debug_test_size: 200
+  
+  # Preprocessing settings
+  preprocessing:
+    remove_newlines: true
+    lowercase: false          # Keep original casing for medical terms
+    add_prefix: "summarize: " # T5 task prefix
+
+# ============================================
+# Training Configuration
+# ============================================
+training:
+  # Basic settings
+  seed: 42
+  num_epochs: 3
+  
+  # Batch sizes (adjust based on GPU memory)
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 8
+  gradient_accumulation_steps: 4  # Effective batch size = 4 * 4 = 16
+  
+  # Optimizer settings
+  learning_rate: 5.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  lr_scheduler_type: linear
+  
+  # Mixed precision
+  fp16: true
+  bf16: false                 # Use if supported by your GPU
+  
+  # Gradient settings
+  max_grad_norm: 1.0
+  gradient_checkpointing: false  # Enable for memory savings
+  
+  # Logging & Checkpointing
+  logging_steps: 100
+  eval_steps: 500
+  save_steps: 500
+  save_total_limit: 2
+  
+  # Early stopping
+  early_stopping: true
+  early_stopping_patience: 3
+  early_stopping_threshold: 0.001
+  
+  # Metric for best model
+  metric_for_best_model: rouge1
+  greater_is_better: true
+  load_best_model_at_end: true
+
+# ============================================
+# Evaluation Configuration
+# ============================================
+evaluation:
+  metrics:
+    - rouge1
+    - rouge2
+    - rougeL
+    - rougeLsum
+    - bertscore
+  
+  # BERTScore settings
+  bertscore:
+    model_type: microsoft/deberta-xlarge-mnli
+    lang: en
+    batch_size: 32
+  
+  # Number of examples for qualitative analysis
+  num_qualitative_examples: 20
+
+# ============================================
+# Output Configuration
+# ============================================
+output:
+  base_dir: ./results
+  checkpoint_dir: ./checkpoints
+  log_dir: ./logs
+  
+  # Save formats
+  save_predictions: true
+  save_training_args: true
+  save_model: true
+
+# ============================================
+# Experiment Tracking
+# ============================================
+tracking:
+  use_wandb: false            # Set to true if using Weights & Biases
+  wandb_project: llm-medical-summarization
+  wandb_entity: null          # Your W&B username
+  
+  use_tensorboard: true
+  tensorboard_dir: ./logs/tensorboard
+
+# ============================================
+# Hardware Configuration
+# ============================================
+hardware:
+  # Will be auto-detected, but can be overridden
+  device: auto                # auto, cuda, cpu
+  num_workers: 4              # DataLoader workers
+  pin_memory: true

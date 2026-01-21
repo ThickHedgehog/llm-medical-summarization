@@ -1,0 +1,10 @@
+experiment,model,method,total_params,trainable_params,trainable_pct,rouge1,rouge2,rougeL,rougeLsum,bertscore_precision,bertscore_recall,bertscore_f1,avg_pred_length,avg_ref_length,training_time_min,peak_memory_gb
+flan-t5-small_prompt_tuning,google/flan-t5-small,prompt_tuning,76981632,20480,0.0266,35.56,10.98,19.46,31.59,58.54,59.17,58.76,152.80,146.48,333.60,0.30
+flan-t5-small_lora,google/flan-t5-small,lora,77649280,688128,0.8862,39.04,13.58,22.08,34.54,60.42,61.46,60.87,155.91,146.48,332.94,0.31
+flan-t5-small_full_ft,google/flan-t5-small,full_ft,76961152,76961152,100.0000,34.47,11.75,21.02,30.16,58.12,59.45,58.78,165.68,146.48,657.62,0.52
+flan-t5-base_prompt_tuning,google/flan-t5-base,prompt_tuning,247608576,30720,0.0124,36.39,11.72,20.13,32.62,58.99,59.77,59.29,159.56,146.48,445.20,0.48
+flan-t5-base_lora,google/flan-t5-base,lora,249347328,1769472,0.7096,41.91,15.93,24.52,37.55,62.22,63.30,62.70,156.75,146.48,736.06,0.96
+flan-t5-base_full_ft,google/flan-t5-base,full_ft,247577856,247577856,100.0000,38.65,13.91,22.24,34.61,61.32,60.85,61.00,141.18,146.48,1842.50,2.85
+flan-t5-large_prompt_tuning,google/flan-t5-large,prompt_tuning,783191040,40960,0.0052,37.24,12.35,20.89,33.48,59.45,60.28,59.86,158.32,146.48,892.40,1.52
+flan-t5-large_lora,google/flan-t5-large,lora,787868672,4718592,0.5989,43.67,17.42,26.18,39.72,63.58,64.45,63.98,154.22,146.48,1524.80,3.12
+flan-t5-large_full_ft,google/flan-t5-large,full_ft,783150080,783150080,100.0000,40.82,15.63,24.15,36.89,62.75,62.18,62.42,145.65,146.48,4256.30,12.45

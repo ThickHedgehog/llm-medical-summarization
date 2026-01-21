@@ -1,0 +1,114 @@
+# LoRA Configuration for Medical Summarization
+# Extends base_config.yaml with LoRA-specific parameters
+
+# ============================================
+# LoRA Hyperparameters
+# ============================================
+lora:
+  # Rank of the low-rank matrices
+  # Higher rank = more parameters, potentially better performance
+  # Typical values: 4, 8, 16, 32, 64
+  r: 16
+  
+  # Alpha parameter (scaling factor)
+  # The actual scaling is alpha/r
+  # Rule of thumb: alpha = 2 * r or alpha = r
+  lora_alpha: 32
+  
+  # Dropout for LoRA layers
+  lora_dropout: 0.1
+  
+  # Target modules to apply LoRA
+  # For T5: q, v are most common; can also include k, o
+  target_modules:
+    - q       # Query projection
+    - v       # Value projection
+    # Uncomment for more comprehensive adaptation:
+    # - k     # Key projection
+    # - o     # Output projection
+  
+  # Whether to use RSLoRA (Rank-Stabilized LoRA)
+  use_rslora: false
+  
+  # Bias handling: none, all, lora_only
+  bias: none
+  
+  # Task type for PEFT
+  task_type: SEQ_2_SEQ_LM
+  
+  # Modules to save (for inference)
+  modules_to_save: null
+
+# ============================================
+# Training Overrides for LoRA
+# ============================================
+training:
+  # LoRA typically benefits from higher learning rate
+  learning_rate: 3.0e-4
+  
+  # Can use larger batch sizes due to fewer parameters
+  per_device_train_batch_size: 8
+  gradient_accumulation_steps: 2
+  
+  # LoRA often needs fewer epochs
+  num_epochs: 5
+  
+  # More frequent evaluation since training is faster
+  eval_steps: 250
+  logging_steps: 50
+  
+  # Gradient settings
+  max_grad_norm: 1.0
+
+# ============================================
+# Memory Optimization for LoRA
+# ============================================
+memory:
+  # Load base model in 8-bit for QLoRA
+  load_in_8bit: false
+  
+  # Load base model in 4-bit for QLoRA  
+  load_in_4bit: false
+  
+  # 4-bit quantization config (if load_in_4bit: true)
+  bnb_4bit_compute_dtype: float16
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+
+# ============================================
+# Experiment Variants
+# ============================================
+# Different LoRA configurations to compare
+variants:
+  # Low-rank configuration (minimal parameters)
+  low_rank:
+    r: 4
+    lora_alpha: 8
+    target_modules: [q, v]
+    
+  # Medium-rank configuration (balanced)
+  medium_rank:
+    r: 16
+    lora_alpha: 32
+    target_modules: [q, v]
+    
+  # High-rank configuration (more expressive)
+  high_rank:
+    r: 64
+    lora_alpha: 128
+    target_modules: [q, k, v, o]
+    
+  # QLoRA configuration (memory efficient)
+  qlora:
+    r: 16
+    lora_alpha: 32
+    target_modules: [q, v]
+    load_in_4bit: true
+
+# ============================================
+# Expected Metrics
+# ============================================
+# Based on literature, expected parameter counts:
+# Flan-T5 Small with LoRA (r=16): ~0.2M trainable (0.25% of total)
+# Flan-T5 Base with LoRA (r=16):  ~0.6M trainable (0.24% of total)
+# Flan-T5 Large with LoRA (r=16): ~1.6M trainable (0.21% of total)
