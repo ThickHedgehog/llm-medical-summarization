@@ -174,4 +174,4 @@ This project is for educational purposes as part of an LLM course.
 
 ## 👤 Author
 
-Ulugbek Shernazarov - Course Project on Large Language Models
+Ulugbek Shernazarov, Rostislav Svitsov - Course Project on Large Language Models
